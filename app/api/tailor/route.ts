@@ -1,48 +1,106 @@
-import { GoogleGenAI } from "@google/genai";
 import { NextResponse } from "next/server";
+import {
+  generateGemini,
+  getGeminiErrorStatus,
+} from "@/lib/gemini";
 
-const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY!,
-});
-
-export async function POST(request: Request) {
+export async function POST(
+  request: Request
+) {
   try {
-    const { resumeName, resume, job } = await request.json();
+    const {
+      resumeName,
+      resume,
+      job,
+    } = await request.json();
 
-    if (!resume || !job) {
+    if (
+      !resume ||
+      !job
+    ) {
       return NextResponse.json(
-        { error: "Resume and job description are required." },
-        { status: 400 }
+        {
+          error:
+            "Resume and job description are required.",
+        },
+        {
+          status: 400,
+        }
+      );
+    }
+
+    if (
+      resume.trim().length < 100 ||
+      job.trim().length < 100
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            "Please enter a valid resume and complete job description.",
+        },
+        {
+          status: 400,
+        }
       );
     }
 
     const prompt = `
 You are an expert resume tailoring assistant.
 
-Your task is to tailor the candidate's existing resume for the target job.
+Your job is to tailor the candidate resume for the target job.
 
-IMPORTANT RULES:
-
-1. Never invent experience, skills, education, certifications, achievements, dates, companies, or projects.
-2. Only use information that already exists in the source resume.
-3. Improve wording and ordering to make relevant experience clearer.
-4. Use important phrases from the job description naturally when they are supported by the resume.
-5. Keep the resume professional and concise.
-6. Extract the job title, company and salary when available.
-7. Calculate a match score from 0 to 100 based on how well the candidate's real experience matches the job.
-8. Missing requirements must reduce the score. Do not add missing skills to the resume.
-9. Return ONLY valid JSON. Do not use markdown or code fences.
-
-Candidate name:
+CANDIDATE NAME:
 ${resumeName}
 
 SOURCE RESUME:
 ${resume}
 
-TARGET JOB:
+TARGET JOB DESCRIPTION:
 ${job}
 
-Return exactly this JSON structure:
+IMPORTANT RULES:
+
+1. Never invent experience.
+
+2. Never invent skills.
+
+3. Never invent education.
+
+4. Never invent certifications.
+
+5. Never invent achievements.
+
+6. Never invent dates, companies or projects.
+
+7. Only use information supported by the source resume.
+
+8. Improve wording, clarity and ordering.
+
+9. Use relevant phrases from the job description naturally when supported by the resume.
+
+10. Keep the resume professional and concise.
+
+11. Extract the job title.
+
+12. Extract the company name when available.
+
+13. Extract salary information when available.
+
+14. Calculate a realistic match score from 0 to 100.
+
+15. Missing requirements must reduce the match score.
+
+16. Never add missing skills to the tailored resume.
+
+17. Identify skills that genuinely match.
+
+18. Identify important job skills missing from the resume.
+
+19. Return only valid JSON.
+
+20. Do not return markdown code fences.
+
+Return exactly this structure:
 
 {
   "role": "",
@@ -55,29 +113,55 @@ Return exactly this JSON structure:
 }
 `;
 
-    const response = await ai.models.generateContent({
-      model: "gemini-3.6-flash",
-      contents: prompt,
-      config: {
-        responseMimeType: "application/json",
-      },
+    const {
+      text,
+      model,
+    } = await generateGemini({
+      prompt,
+      json: true,
     });
 
-    const text = response.text;
+    const result =
+      JSON.parse(text);
 
-    if (!text) {
-      throw new Error("Gemini returned an empty response.");
+    return NextResponse.json({
+      ...result,
+      generatedWith: model,
+    });
+  } catch (error) {
+    console.error(
+      "Tailor API error:",
+      error
+    );
+
+    const status =
+      getGeminiErrorStatus(
+        error
+      );
+
+    if (
+      status === 503 ||
+      status === 429
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            "AI is currently busy. Please try again in a moment.",
+        },
+        {
+          status: 503,
+        }
+      );
     }
 
-    const result = JSON.parse(text);
-
-    return NextResponse.json(result);
-  } catch (error) {
-    console.error("Tailor API error:", error);
-
     return NextResponse.json(
-      { error: "Unable to tailor the resume. Please try again." },
-      { status: 500 }
+      {
+        error:
+          "Unable to tailor the resume. Please try again.",
+      },
+      {
+        status: 500,
+      }
     );
   }
 }
