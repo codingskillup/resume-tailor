@@ -44,6 +44,8 @@ export default function Home() {
   const [interviewError, setInterviewError] =
     useState("");
 
+  const [copiedKey, setCopiedKey] = useState("");
+
   const ready =
     resumeName.trim().length > 0 &&
     resume.trim().length > 0 &&
@@ -480,24 +482,44 @@ export default function Home() {
       }
     };
 
-  return (
-    <main className="min-h-screen bg-[#f7f8fa] text-[#16181d]">
-      <div className="mx-auto max-w-[1280px] px-5 py-10 md:px-8 md:py-14">
+  const copyToClipboard = async (
+    text: string,
+    key: string
+  ) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedKey(key);
 
-        <header className="mb-10">
-          <div className="mb-4 inline-flex rounded-full border border-[#e5e7eb] bg-white px-3 py-1 text-xs font-medium text-[#60646c] shadow-sm">
+      window.setTimeout(() => {
+        setCopiedKey((current) =>
+          current === key ? "" : current
+        );
+      }, 1800);
+    } catch {
+      setError(
+        "Unable to copy. Please select the text and copy it manually."
+      );
+    }
+  };
+
+  return (
+    <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,#ede9fe_0%,transparent_32%),radial-gradient(circle_at_top_right,#dbeafe_0%,transparent_28%),linear-gradient(to_bottom,#fafaff,#f6f7fb)] font-sans text-[#191922] antialiased">
+      <div className="mx-auto max-w-[1320px] px-4 py-8 sm:px-6 md:px-8 md:py-12">
+
+        <header className="mb-8 rounded-[30px] border border-white/80 bg-white/80 p-6 shadow-[0_24px_70px_-35px_rgba(76,67,155,0.35)] backdrop-blur-xl sm:p-8 md:p-10">
+          <div className="mb-5 inline-flex items-center rounded-full border border-[#dedaff] bg-[#f3f1ff] px-3.5 py-1.5 text-xs font-semibold tracking-wide text-[#5b4ed6]">
             AI Resume Builder
           </div>
 
-          <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">
+          <h1 className="max-w-3xl text-4xl font-bold tracking-[-0.035em] text-[#17171f] sm:text-5xl md:text-6xl">
             Tailor your resume
-            <span className="text-[#6d5dfc]">
+            <span className="bg-gradient-to-r from-[#5b5bd6] to-[#7c3aed] bg-clip-text text-transparent">
               {" "}
               for the job.
             </span>
           </h1>
 
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-[#686b73] md:text-base">
+          <p className="mt-5 max-w-2xl text-[15px] leading-7 text-[#666773] md:text-base">
             Add your current resume and
             the job you want. AI will
             create a focused version
@@ -508,11 +530,11 @@ export default function Home() {
 
         <div className="grid gap-6 lg:grid-cols-2">
 
-          <section className="rounded-2xl border border-[#e3e5e8] bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] md:p-7">
+          <section className="rounded-[28px] border border-white/80 bg-white/90 p-5 shadow-[0_20px_55px_-30px_rgba(35,31,88,0.28)] backdrop-blur md:p-7">
 
             <div className="mb-6 flex items-start gap-4">
 
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#f0efff] text-sm font-semibold text-[#6254e8]">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#5b5bd6] to-[#7c3aed] text-sm font-bold text-white shadow-[0_10px_22px_-10px_rgba(91,91,214,0.85)]">
                 01
               </div>
 
@@ -541,7 +563,7 @@ export default function Home() {
                 )
               }
               placeholder="e.g. Zohaib"
-              className="mb-5 h-12 w-full rounded-xl border border-[#dedfe3] bg-white px-4 text-sm outline-none transition focus:border-[#7467f0] focus:ring-4 focus:ring-[#7467f0]/10"
+              className="mb-5 h-12 w-full rounded-2xl border border-[#e4e3ee] bg-[#fbfbfe] px-4 text-sm text-[#292932] outline-none transition placeholder:text-[#a2a3ad] focus:border-[#7064e8] focus:bg-white focus:ring-4 focus:ring-[#7064e8]/10"
             />
 
             <div className="mb-2 flex items-center justify-between">
@@ -564,16 +586,16 @@ export default function Home() {
                 )
               }
               placeholder="Paste your current resume here..."
-              className="min-h-[360px] w-full resize-none rounded-xl border border-[#dedfe3] bg-white p-4 text-sm leading-6 outline-none transition focus:border-[#7467f0] focus:ring-4 focus:ring-[#7467f0]/10"
+              className="min-h-[360px] w-full resize-none rounded-2xl border border-[#e4e3ee] bg-[#fbfbfe] p-4 text-sm leading-7 text-[#30313a] outline-none transition placeholder:text-[#a2a3ad] focus:border-[#7064e8] focus:bg-white focus:ring-4 focus:ring-[#7064e8]/10"
             />
 
           </section>
 
-          <section className="rounded-2xl border border-[#e3e5e8] bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] md:p-7">
+          <section className="rounded-[28px] border border-white/80 bg-white/90 p-5 shadow-[0_20px_55px_-30px_rgba(35,31,88,0.28)] backdrop-blur md:p-7">
 
             <div className="mb-6 flex items-start gap-4">
 
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#f0efff] text-sm font-semibold text-[#6254e8]">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#5b5bd6] to-[#7c3aed] text-sm font-bold text-white shadow-[0_10px_22px_-10px_rgba(91,91,214,0.85)]">
                 02
               </div>
 
@@ -610,10 +632,10 @@ export default function Home() {
                 )
               }
               placeholder="Paste the job title, requirements, responsibilities and company details here..."
-              className="min-h-[360px] w-full resize-none rounded-xl border border-[#dedfe3] bg-white p-4 text-sm leading-6 outline-none transition focus:border-[#7467f0] focus:ring-4 focus:ring-[#7467f0]/10"
+              className="min-h-[360px] w-full resize-none rounded-2xl border border-[#e4e3ee] bg-[#fbfbfe] p-4 text-sm leading-7 text-[#30313a] outline-none transition placeholder:text-[#a2a3ad] focus:border-[#7064e8] focus:bg-white focus:ring-4 focus:ring-[#7064e8]/10"
             />
 
-            <div className="mt-5 rounded-xl bg-[#f7f7fa] p-4">
+            <div className="mt-5 rounded-2xl border border-[#ebe9ff] bg-gradient-to-r from-[#f7f5ff] to-[#f6f9ff] p-4">
 
               <p className="text-sm font-medium">
                 What we&apos;ll detect
@@ -633,14 +655,14 @@ export default function Home() {
 
         </div>
 
-        <div className="mt-6 flex flex-col items-center justify-between gap-4 rounded-2xl border border-[#e3e5e8] bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] sm:flex-row">
+        <div className="mt-6 flex flex-col items-center justify-between gap-4 rounded-[26px] border border-[#e6e4f2] bg-[#1e1e2a] p-5 shadow-[0_20px_45px_-28px_rgba(30,30,42,0.7)] sm:flex-row sm:p-6">
 
           <div>
-            <p className="text-sm font-semibold">
+            <p className="text-sm font-semibold text-white">
               Ready to tailor?
             </p>
 
-            <p className="mt-1 text-xs text-[#777a82]">
+            <p className="mt-1 text-xs leading-5 text-[#b9bac4]">
               AI will only use experience
               already present in your
               resume.
@@ -653,7 +675,7 @@ export default function Home() {
               !ready ||
               loading
             }
-            className="h-12 w-full min-w-[160px] rounded-xl bg-[#6254e8] px-7 text-sm font-semibold text-white transition hover:bg-[#5548d8] disabled:cursor-not-allowed disabled:bg-[#c7c7cc] sm:w-auto"
+            className="h-12 w-full min-w-[170px] rounded-2xl bg-gradient-to-r from-[#7166f5] to-[#8b5cf6] px-7 text-sm font-semibold text-white shadow-[0_12px_30px_-14px_rgba(113,102,245,0.95)] transition hover:-translate-y-0.5 hover:shadow-[0_16px_34px_-14px_rgba(113,102,245,1)] disabled:cursor-not-allowed disabled:opacity-45 sm:w-auto"
           >
             {loading
               ? "Tailoring..."
@@ -663,7 +685,7 @@ export default function Home() {
         </div>
 
         {loading && (
-          <div className="mt-6 rounded-2xl border border-[#e3e5e8] bg-white p-8 text-center">
+          <div className="mt-6 rounded-[26px] border border-[#e8e6f4] bg-white/90 p-8 text-center shadow-[0_18px_45px_-30px_rgba(35,31,88,0.28)] backdrop-blur">
 
             <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-[#e8e6ff] border-t-[#6254e8]" />
 
@@ -701,11 +723,11 @@ export default function Home() {
 
             <div className="mb-5">
 
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#6254e8]">
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#6758dd]">
                 AI Analysis
               </p>
 
-              <h2 className="mt-2 text-2xl font-semibold tracking-tight">
+              <h2 className="mt-2 text-3xl font-bold tracking-[-0.025em] text-[#1b1b24]">
                 Your tailored resume
               </h2>
 
@@ -743,7 +765,7 @@ export default function Home() {
                 }
               />
 
-              <div className="rounded-2xl border border-[#e3e5e8] bg-white p-5">
+              <div className="rounded-[24px] border border-[#e8e6f1] bg-white/95 p-5 shadow-[0_16px_40px_-30px_rgba(35,31,88,0.28)]">
 
                 <p className="text-xs text-[#858890]">
                   Match score
@@ -751,7 +773,7 @@ export default function Home() {
 
                 <div className="mt-2 flex items-end gap-1">
 
-                  <span className="text-3xl font-semibold text-[#6254e8]">
+                  <span className="text-3xl font-bold text-[#6254e8]">
                     {result.matchScore}
                   </span>
 
@@ -767,7 +789,7 @@ export default function Home() {
 
             <div className="mt-4 grid gap-4 lg:grid-cols-2">
 
-              <div className="rounded-2xl border border-[#e3e5e8] bg-white p-5">
+              <div className="rounded-[24px] border border-[#e8e6f1] bg-white/95 p-5 shadow-[0_16px_40px_-30px_rgba(35,31,88,0.28)]">
 
                 <p className="text-sm font-semibold">
                   Matched skills
@@ -804,7 +826,7 @@ export default function Home() {
 
               </div>
 
-              <div className="rounded-2xl border border-[#e3e5e8] bg-white p-5">
+              <div className="rounded-[24px] border border-[#e8e6f1] bg-white/95 p-5 shadow-[0_16px_40px_-30px_rgba(35,31,88,0.28)]">
 
                 <p className="text-sm font-semibold">
                   Missing skills
@@ -843,7 +865,7 @@ export default function Home() {
 
             </div>
 
-            <div className="mt-4 overflow-hidden rounded-2xl border border-[#e3e5e8] bg-white">
+            <div className="mt-4 overflow-hidden rounded-[26px] border border-[#e6e4ef] bg-white shadow-[0_18px_50px_-32px_rgba(35,31,88,0.3)]">
 
               <div className="flex flex-col justify-between gap-3 border-b border-[#ececef] px-5 py-4 sm:flex-row sm:items-center">
 
@@ -878,12 +900,12 @@ export default function Home() {
                       e.target.value,
                   })
                 }
-                className="min-h-[600px] w-full resize-y bg-white p-6 text-sm leading-7 outline-none"
+                className="min-h-[600px] w-full resize-y bg-[#fff] p-6 text-[15px] leading-8 text-[#2d2e36] outline-none"
               />
 
             </div>
 
-            <div className="mt-4 flex flex-col gap-4 rounded-2xl border border-[#e3e5e8] bg-white p-5 sm:flex-row sm:items-center sm:justify-between">
+            <div className="mt-4 flex flex-col gap-4 rounded-[24px] border border-[#e8e6f1] bg-white/95 p-5 shadow-[0_16px_40px_-30px_rgba(35,31,88,0.28)] sm:flex-row sm:items-center sm:justify-between">
 
               <div>
                 <p className="text-sm font-semibold">
@@ -904,7 +926,7 @@ export default function Home() {
                   pdfLoading ||
                   !result.tailoredResume.trim()
                 }
-                className="h-11 shrink-0 rounded-xl bg-[#6254e8] px-6 text-sm font-semibold text-white transition hover:bg-[#5548d8] disabled:cursor-not-allowed disabled:bg-[#c7c7cc]"
+                className="h-11 shrink-0 rounded-2xl bg-gradient-to-r from-[#5b5bd6] to-[#7c3aed] px-6 text-sm font-semibold text-white shadow-[0_12px_28px_-14px_rgba(91,91,214,0.9)] transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-45"
               >
                 {pdfLoading
                   ? "Creating PDF..."
@@ -913,12 +935,12 @@ export default function Home() {
 
             </div>
 
-            <div className="mt-4 rounded-2xl border border-[#e3e5e8] bg-white p-5 md:p-6">
+            <div className="mt-4 rounded-[24px] border border-[#e8e6f1] bg-white/95 p-5 shadow-[0_16px_40px_-30px_rgba(35,31,88,0.28)] md:p-6">
 
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#6254e8]">
+                  <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#6758dd]">
                     Cover Letter
                   </p>
 
@@ -942,7 +964,7 @@ export default function Home() {
                   disabled={
                     coverLoading
                   }
-                  className="h-11 shrink-0 rounded-xl bg-[#16181d] px-6 text-sm font-semibold text-white transition hover:bg-black disabled:cursor-not-allowed disabled:bg-[#a5a5aa]"
+                  className="h-11 shrink-0 rounded-2xl bg-[#20202b] px-6 text-sm font-semibold text-white shadow-[0_12px_26px_-16px_rgba(32,32,43,0.9)] transition hover:-translate-y-0.5 hover:bg-[#16161e] disabled:cursor-not-allowed disabled:opacity-45"
                 >
                   {coverLoading
                     ? "Generating..."
@@ -1007,7 +1029,7 @@ export default function Home() {
                           e.target.value
                         )
                       }
-                      className="min-h-[420px] w-full resize-y bg-white p-5 text-sm leading-7 outline-none"
+                      className="min-h-[420px] w-full resize-y bg-white p-5 text-[15px] leading-8 text-[#30313a] outline-none"
                     />
 
                     <div className="flex justify-end border-t border-[#ececef] p-4">
@@ -1015,13 +1037,16 @@ export default function Home() {
                       <button
                         type="button"
                         onClick={() =>
-                          navigator.clipboard.writeText(
-                            coverLetter
+                          copyToClipboard(
+                            coverLetter,
+                            "cover"
                           )
                         }
-                        className="h-10 rounded-xl border border-[#dedfe3] bg-white px-5 text-sm font-medium transition hover:bg-[#f7f7fa]"
+                        className="h-10 rounded-xl border border-[#dedbf0] bg-white px-5 text-sm font-semibold text-[#4f46c8] transition hover:border-[#cfc9ff] hover:bg-[#f7f5ff]"
                       >
-                        Copy Cover Letter
+                        {copiedKey === "cover"
+                          ? "Copied ✓"
+                          : "Copy Cover Letter"}
                       </button>
 
                     </div>
@@ -1031,12 +1056,12 @@ export default function Home() {
 
             </div>
 
-            <div className="mt-4 rounded-2xl border border-[#e3e5e8] bg-white p-5 md:p-6">
+            <div className="mt-4 rounded-[24px] border border-[#e8e6f1] bg-white/95 p-5 shadow-[0_16px_40px_-30px_rgba(35,31,88,0.28)] md:p-6">
 
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#6254e8]">
+                  <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#6758dd]">
                     Interview Prep
                   </p>
 
@@ -1060,7 +1085,7 @@ export default function Home() {
                   disabled={
                     interviewLoading
                   }
-                  className="h-11 shrink-0 rounded-xl bg-[#16181d] px-6 text-sm font-semibold text-white transition hover:bg-black disabled:cursor-not-allowed disabled:bg-[#a5a5aa]"
+                  className="h-11 shrink-0 rounded-2xl bg-[#20202b] px-6 text-sm font-semibold text-white shadow-[0_12px_26px_-16px_rgba(32,32,43,0.9)] transition hover:-translate-y-0.5 hover:bg-[#16161e] disabled:cursor-not-allowed disabled:opacity-45"
                 >
                   {interviewLoading
                     ? "Preparing..."
@@ -1115,7 +1140,7 @@ export default function Home() {
                       ) => (
                         <details
                           key={index}
-                          className="group overflow-hidden rounded-xl border border-[#e3e5e8] bg-white"
+                          className="group overflow-hidden rounded-2xl border border-[#e6e4ef] bg-white transition hover:border-[#d8d4f5] hover:shadow-[0_12px_30px_-24px_rgba(91,91,214,0.55)]"
                         >
 
                           <summary className="flex cursor-pointer list-none items-start justify-between gap-4 p-5">
@@ -1165,13 +1190,17 @@ export default function Home() {
                             <button
                               type="button"
                               onClick={() =>
-                                navigator.clipboard.writeText(
-                                  item.answer
+                                copyToClipboard(
+                                  item.answer,
+                                  `answer-${index}`
                                 )
                               }
-                              className="mt-4 rounded-lg border border-[#dedfe3] bg-white px-3 py-2 text-xs font-medium transition hover:bg-[#f7f7fa]"
+                              className="mt-4 rounded-xl border border-[#dedbf0] bg-white px-3.5 py-2 text-xs font-semibold text-[#4f46c8] transition hover:border-[#cfc9ff] hover:bg-[#f7f5ff]"
                             >
-                              Copy Answer
+                              {copiedKey ===
+                              `answer-${index}`
+                                ? "Copied ✓"
+                                : "Copy Answer"}
                             </button>
 
                           </div>
@@ -1188,7 +1217,16 @@ export default function Home() {
           </section>
         )}
 
-        <p className="mt-8 text-center text-xs text-[#92949a]">
+        {copiedKey && (
+          <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-2xl border border-[#dcd8ff] bg-[#242432] px-4 py-3 text-sm font-semibold text-white shadow-[0_18px_45px_-20px_rgba(36,36,50,0.75)]">
+            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#6d5dfc] text-xs">
+              ✓
+            </span>
+            Copied to clipboard
+          </div>
+        )}
+
+        <p className="mt-10 text-center text-xs font-medium text-[#8b8c97]">
           Your resume is not saved to a
           database.
         </p>
@@ -1206,7 +1244,7 @@ function InfoCard({
   value: string;
 }) {
   return (
-    <div className="rounded-2xl border border-[#e3e5e8] bg-white p-5">
+    <div className="rounded-[24px] border border-[#e8e6f1] bg-white/95 p-5 shadow-[0_16px_40px_-30px_rgba(35,31,88,0.28)]">
 
       <p className="text-xs text-[#858890]">
         {label}
